@@ -2,7 +2,6 @@ import { app } from "./src/server.js";
 import { connectDB, getIsDbConnected } from "./src/lib/db.js";
 import dotenv from "dotenv";
 import http from "http";
-import killPort from "kill-port";
 
 dotenv.config({
   path: "./.env",
@@ -19,6 +18,7 @@ async function startServer(retries = 2) {
     if (err.code === "EADDRINUSE" && retries > 0) {
       console.warn(`⚠️ Port ${PORT} is busy. Automatically freeing it and retrying...`);
       try {
+        const { default: killPort } = await import("kill-port");
         await killPort(PORT);
         setTimeout(() => startServer(retries - 1), 1000);
       } catch (killErr) {
